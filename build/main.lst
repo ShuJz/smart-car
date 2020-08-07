@@ -1,0 +1,841 @@
+ARM GAS  /tmp/ccSIf5vS.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"main.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.SystemClock_Config,"ax",%progbits
+  19              		.align	2
+  20              		.global	SystemClock_Config
+  21              		.thumb
+  22              		.thumb_func
+  24              	SystemClock_Config:
+  25              	.LFB66:
+  26              		.file 1 "Src/main.c"
+   1:Src/main.c    **** /* USER CODE BEGIN Header */
+   2:Src/main.c    **** /**
+   3:Src/main.c    ****   ******************************************************************************
+   4:Src/main.c    ****   * @file           : main.c
+   5:Src/main.c    ****   * @brief          : Main program body
+   6:Src/main.c    ****   ******************************************************************************
+   7:Src/main.c    ****   * @attention
+   8:Src/main.c    ****   *
+   9:Src/main.c    ****   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  10:Src/main.c    ****   * All rights reserved.</center></h2>
+  11:Src/main.c    ****   *
+  12:Src/main.c    ****   * This software component is licensed by ST under BSD 3-Clause license,
+  13:Src/main.c    ****   * the "License"; You may not use this file except in compliance with the
+  14:Src/main.c    ****   * License. You may obtain a copy of the License at:
+  15:Src/main.c    ****   *                        opensource.org/licenses/BSD-3-Clause
+  16:Src/main.c    ****   *
+  17:Src/main.c    ****   ******************************************************************************
+  18:Src/main.c    ****   */
+  19:Src/main.c    **** /* USER CODE END Header */
+  20:Src/main.c    **** 
+  21:Src/main.c    **** /* Includes ------------------------------------------------------------------*/
+  22:Src/main.c    **** #include "main.h"
+  23:Src/main.c    **** #include "dma.h"
+  24:Src/main.c    **** #include "tim.h"
+  25:Src/main.c    **** #include "usart.h"
+  26:Src/main.c    **** #include "gpio.h"
+  27:Src/main.c    **** 
+  28:Src/main.c    **** /* Private includes ----------------------------------------------------------*/
+  29:Src/main.c    **** /* USER CODE BEGIN Includes */
+  30:Src/main.c    **** 
+  31:Src/main.c    **** /* USER CODE END Includes */
+  32:Src/main.c    **** 
+ARM GAS  /tmp/ccSIf5vS.s 			page 2
+
+
+  33:Src/main.c    **** /* Private typedef -----------------------------------------------------------*/
+  34:Src/main.c    **** /* USER CODE BEGIN PTD */
+  35:Src/main.c    **** 
+  36:Src/main.c    **** /* USER CODE END PTD */
+  37:Src/main.c    **** 
+  38:Src/main.c    **** /* Private define ------------------------------------------------------------*/
+  39:Src/main.c    **** /* USER CODE BEGIN PD */
+  40:Src/main.c    **** /* USER CODE END PD */
+  41:Src/main.c    **** 
+  42:Src/main.c    **** /* Private macro -------------------------------------------------------------*/
+  43:Src/main.c    **** /* USER CODE BEGIN PM */
+  44:Src/main.c    **** 
+  45:Src/main.c    **** /* USER CODE END PM */
+  46:Src/main.c    **** 
+  47:Src/main.c    **** /* Private variables ---------------------------------------------------------*/
+  48:Src/main.c    **** 
+  49:Src/main.c    **** /* USER CODE BEGIN PV */
+  50:Src/main.c    **** 
+  51:Src/main.c    **** /* USER CODE END PV */
+  52:Src/main.c    **** 
+  53:Src/main.c    **** /* Private function prototypes -----------------------------------------------*/
+  54:Src/main.c    **** void SystemClock_Config(void);
+  55:Src/main.c    **** /* USER CODE BEGIN PFP */
+  56:Src/main.c    **** 
+  57:Src/main.c    **** /* USER CODE END PFP */
+  58:Src/main.c    **** 
+  59:Src/main.c    **** /* Private user code ---------------------------------------------------------*/
+  60:Src/main.c    **** /* USER CODE BEGIN 0 */
+  61:Src/main.c    **** int16_t dutyCycle = 0;  //0-ARR
+  62:Src/main.c    **** uint8_t speed_dutyCycle_ab = 15;  //absolut dutyCycle
+  63:Src/main.c    **** uint8_t steering_dutyCycle_ab = 15;  //absolut dutyCycle
+  64:Src/main.c    **** uint8_t recv_buf[9] = {0};
+  65:Src/main.c    **** uint16_t recv_size = 9;
+  66:Src/main.c    **** /* USER CODE END 0 */
+  67:Src/main.c    **** 
+  68:Src/main.c    **** /**
+  69:Src/main.c    ****   * @brief  The application entry point.
+  70:Src/main.c    ****   * @retval int
+  71:Src/main.c    ****   */
+  72:Src/main.c    **** int main(void)
+  73:Src/main.c    **** {
+  74:Src/main.c    ****   /* USER CODE BEGIN 1 */
+  75:Src/main.c    ****   uint16_t LED_counter = 0;
+  76:Src/main.c    ****   /* USER CODE END 1 */
+  77:Src/main.c    **** 
+  78:Src/main.c    ****   /* MCU Configuration--------------------------------------------------------*/
+  79:Src/main.c    **** 
+  80:Src/main.c    ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  81:Src/main.c    ****   HAL_Init();
+  82:Src/main.c    **** 
+  83:Src/main.c    ****   /* USER CODE BEGIN Init */
+  84:Src/main.c    **** 
+  85:Src/main.c    ****   /* USER CODE END Init */
+  86:Src/main.c    **** 
+  87:Src/main.c    ****   /* Configure the system clock */
+  88:Src/main.c    ****   SystemClock_Config();
+  89:Src/main.c    **** 
+ARM GAS  /tmp/ccSIf5vS.s 			page 3
+
+
+  90:Src/main.c    ****   /* USER CODE BEGIN SysInit */
+  91:Src/main.c    **** 
+  92:Src/main.c    ****   /* USER CODE END SysInit */
+  93:Src/main.c    **** 
+  94:Src/main.c    ****   /* Initialize all configured peripherals */
+  95:Src/main.c    ****   MX_GPIO_Init();
+  96:Src/main.c    ****   MX_DMA_Init();
+  97:Src/main.c    ****   MX_TIM4_Init();
+  98:Src/main.c    ****   MX_USART1_UART_Init();
+  99:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 100:Src/main.c    ****   
+ 101:Src/main.c    ****   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_3);     //Motor PWM
+ 102:Src/main.c    ****   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);     //Steering motor PWM
+ 103:Src/main.c    ****   HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_RESET);
+ 104:Src/main.c    ****   HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_RESET);
+ 105:Src/main.c    **** 
+ 106:Src/main.c    ****   HAL_GPIO_WritePin(STBY_GPIO_Port, STBY_Pin, GPIO_PIN_SET); //Motor STBY
+ 107:Src/main.c    **** 
+ 108:Src/main.c    ****   HAL_UART_Receive_DMA(&huart1, recv_buf, recv_size); //UART1
+ 109:Src/main.c    **** 
+ 110:Src/main.c    ****   /* USER CODE END 2 */
+ 111:Src/main.c    **** 
+ 112:Src/main.c    ****   /* Infinite loop */
+ 113:Src/main.c    ****   /* USER CODE BEGIN WHILE */
+ 114:Src/main.c    **** 
+ 115:Src/main.c    ****   //Initial motor controller HobbyWing 1060
+ 116:Src/main.c    ****   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+ 117:Src/main.c    ****   HAL_Delay(5000);
+ 118:Src/main.c    ****   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 15);
+ 119:Src/main.c    ****   HAL_Delay(2000);
+ 120:Src/main.c    ****   
+ 121:Src/main.c    ****   //Initial steering servo motor
+ 122:Src/main.c    ****   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 15);
+ 123:Src/main.c    ****   HAL_Delay(2000);
+ 124:Src/main.c    **** 
+ 125:Src/main.c    ****   while (1)
+ 126:Src/main.c    ****   {
+ 127:Src/main.c    ****     /* USER CODE END WHILE */
+ 128:Src/main.c    **** 
+ 129:Src/main.c    ****     /* USER CODE BEGIN 3 */
+ 130:Src/main.c    ****     LED_counter ++;
+ 131:Src/main.c    ****     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, speed_dutyCycle_ab);
+ 132:Src/main.c    ****     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, steering_dutyCycle_ab);
+ 133:Src/main.c    **** 
+ 134:Src/main.c    ****     if (LED_counter == 50){
+ 135:Src/main.c    ****       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+ 136:Src/main.c    ****     }
+ 137:Src/main.c    ****     else if (LED_counter == 100){
+ 138:Src/main.c    ****       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+ 139:Src/main.c    ****       LED_counter = 0;
+ 140:Src/main.c    ****     }
+ 141:Src/main.c    ****     
+ 142:Src/main.c    **** 
+ 143:Src/main.c    ****     HAL_Delay(10);
+ 144:Src/main.c    ****   }
+ 145:Src/main.c    ****   /* USER CODE END 3 */
+ 146:Src/main.c    **** }
+ARM GAS  /tmp/ccSIf5vS.s 			page 4
+
+
+ 147:Src/main.c    **** 
+ 148:Src/main.c    **** /**
+ 149:Src/main.c    ****   * @brief System Clock Configuration
+ 150:Src/main.c    ****   * @retval None
+ 151:Src/main.c    ****   */
+ 152:Src/main.c    **** void SystemClock_Config(void)
+ 153:Src/main.c    **** {
+  27              		.loc 1 153 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 64
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31 0000 30B5     		push	{r4, r5, lr}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 12
+  34              		.cfi_offset 4, -12
+  35              		.cfi_offset 5, -8
+  36              		.cfi_offset 14, -4
+  37 0002 91B0     		sub	sp, sp, #68
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 80
+ 154:Src/main.c    ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  40              		.loc 1 154 0
+  41 0004 0024     		movs	r4, #0
+  42 0006 0894     		str	r4, [sp, #32]
+  43 0008 0994     		str	r4, [sp, #36]
+  44 000a 0B94     		str	r4, [sp, #44]
+  45 000c 0C94     		str	r4, [sp, #48]
+ 155:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  46              		.loc 1 155 0
+  47 000e 0194     		str	r4, [sp, #4]
+  48 0010 0294     		str	r4, [sp, #8]
+  49 0012 0394     		str	r4, [sp, #12]
+  50 0014 0494     		str	r4, [sp, #16]
+  51 0016 0594     		str	r4, [sp, #20]
+ 156:Src/main.c    **** 
+ 157:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 158:Src/main.c    ****   */
+ 159:Src/main.c    ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  52              		.loc 1 159 0
+  53 0018 0122     		movs	r2, #1
+  54 001a 0692     		str	r2, [sp, #24]
+ 160:Src/main.c    ****   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  55              		.loc 1 160 0
+  56 001c 4FF48033 		mov	r3, #65536
+  57 0020 0793     		str	r3, [sp, #28]
+ 161:Src/main.c    ****   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+ 162:Src/main.c    ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  58              		.loc 1 162 0
+  59 0022 0A92     		str	r2, [sp, #40]
+ 163:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  60              		.loc 1 163 0
+  61 0024 0225     		movs	r5, #2
+  62 0026 0D95     		str	r5, [sp, #52]
+ 164:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  63              		.loc 1 164 0
+  64 0028 0E93     		str	r3, [sp, #56]
+ 165:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+ARM GAS  /tmp/ccSIf5vS.s 			page 5
+
+
+  65              		.loc 1 165 0
+  66 002a 4FF4E013 		mov	r3, #1835008
+  67 002e 0F93     		str	r3, [sp, #60]
+ 166:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  68              		.loc 1 166 0
+  69 0030 06A8     		add	r0, sp, #24
+  70 0032 FFF7FEFF 		bl	HAL_RCC_OscConfig
+  71              	.LVL0:
+ 167:Src/main.c    ****   {
+ 168:Src/main.c    ****     Error_Handler();
+ 169:Src/main.c    ****   }
+ 170:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 171:Src/main.c    ****   */
+ 172:Src/main.c    ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+  72              		.loc 1 172 0
+  73 0036 0F23     		movs	r3, #15
+  74 0038 0193     		str	r3, [sp, #4]
+ 173:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 174:Src/main.c    ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  75              		.loc 1 174 0
+  76 003a 0295     		str	r5, [sp, #8]
+ 175:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  77              		.loc 1 175 0
+  78 003c 0394     		str	r4, [sp, #12]
+ 176:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  79              		.loc 1 176 0
+  80 003e 4FF48063 		mov	r3, #1024
+  81 0042 0493     		str	r3, [sp, #16]
+ 177:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  82              		.loc 1 177 0
+  83 0044 0594     		str	r4, [sp, #20]
+ 178:Src/main.c    **** 
+ 179:Src/main.c    ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  84              		.loc 1 179 0
+  85 0046 01A8     		add	r0, sp, #4
+  86 0048 2946     		mov	r1, r5
+  87 004a FFF7FEFF 		bl	HAL_RCC_ClockConfig
+  88              	.LVL1:
+ 180:Src/main.c    ****   {
+ 181:Src/main.c    ****     Error_Handler();
+ 182:Src/main.c    ****   }
+ 183:Src/main.c    **** }
+  89              		.loc 1 183 0
+  90 004e 11B0     		add	sp, sp, #68
+  91              	.LCFI2:
+  92              		.cfi_def_cfa_offset 12
+  93              		@ sp needed
+  94 0050 30BD     		pop	{r4, r5, pc}
+  95              		.cfi_endproc
+  96              	.LFE66:
+  98 0052 00BF     		.section	.text.main,"ax",%progbits
+  99              		.align	2
+ 100              		.global	main
+ 101              		.thumb
+ 102              		.thumb_func
+ 104              	main:
+ 105              	.LFB65:
+ARM GAS  /tmp/ccSIf5vS.s 			page 6
+
+
+  73:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 106              		.loc 1 73 0
+ 107              		.cfi_startproc
+ 108              		@ args = 0, pretend = 0, frame = 0
+ 109              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110 0000 38B5     		push	{r3, r4, r5, lr}
+ 111              	.LCFI3:
+ 112              		.cfi_def_cfa_offset 16
+ 113              		.cfi_offset 3, -16
+ 114              		.cfi_offset 4, -12
+ 115              		.cfi_offset 5, -8
+ 116              		.cfi_offset 14, -4
+ 117              	.LVL2:
+  81:Src/main.c    **** 
+ 118              		.loc 1 81 0
+ 119 0002 FFF7FEFF 		bl	HAL_Init
+ 120              	.LVL3:
+  88:Src/main.c    **** 
+ 121              		.loc 1 88 0
+ 122 0006 FFF7FEFF 		bl	SystemClock_Config
+ 123              	.LVL4:
+  95:Src/main.c    ****   MX_DMA_Init();
+ 124              		.loc 1 95 0
+ 125 000a FFF7FEFF 		bl	MX_GPIO_Init
+ 126              	.LVL5:
+  96:Src/main.c    ****   MX_TIM4_Init();
+ 127              		.loc 1 96 0
+ 128 000e FFF7FEFF 		bl	MX_DMA_Init
+ 129              	.LVL6:
+  97:Src/main.c    ****   MX_USART1_UART_Init();
+ 130              		.loc 1 97 0
+ 131 0012 FFF7FEFF 		bl	MX_TIM4_Init
+ 132              	.LVL7:
+  98:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 133              		.loc 1 98 0
+ 134 0016 FFF7FEFF 		bl	MX_USART1_UART_Init
+ 135              	.LVL8:
+ 101:Src/main.c    ****   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);     //Steering motor PWM
+ 136              		.loc 1 101 0
+ 137 001a 2B4C     		ldr	r4, .L8
+ 138 001c 2046     		mov	r0, r4
+ 139 001e 0821     		movs	r1, #8
+ 140 0020 FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 141              	.LVL9:
+ 102:Src/main.c    ****   HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_RESET);
+ 142              		.loc 1 102 0
+ 143 0024 2046     		mov	r0, r4
+ 144 0026 0C21     		movs	r1, #12
+ 145 0028 FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 146              	.LVL10:
+ 103:Src/main.c    ****   HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_RESET);
+ 147              		.loc 1 103 0
+ 148 002c 274D     		ldr	r5, .L8+4
+ 149 002e 2846     		mov	r0, r5
+ 150 0030 1021     		movs	r1, #16
+ 151 0032 0022     		movs	r2, #0
+ 152 0034 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ARM GAS  /tmp/ccSIf5vS.s 			page 7
+
+
+ 153              	.LVL11:
+ 104:Src/main.c    **** 
+ 154              		.loc 1 104 0
+ 155 0038 2846     		mov	r0, r5
+ 156 003a 2021     		movs	r1, #32
+ 157 003c 0022     		movs	r2, #0
+ 158 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 159              	.LVL12:
+ 106:Src/main.c    **** 
+ 160              		.loc 1 106 0
+ 161 0042 2348     		ldr	r0, .L8+8
+ 162 0044 0221     		movs	r1, #2
+ 163 0046 0122     		movs	r2, #1
+ 164 0048 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 165              	.LVL13:
+ 108:Src/main.c    **** 
+ 166              		.loc 1 108 0
+ 167 004c 2148     		ldr	r0, .L8+12
+ 168 004e 2249     		ldr	r1, .L8+16
+ 169 0050 224B     		ldr	r3, .L8+20
+ 170 0052 1A88     		ldrh	r2, [r3]
+ 171 0054 FFF7FEFF 		bl	HAL_UART_Receive_DMA
+ 172              	.LVL14:
+ 116:Src/main.c    ****   HAL_Delay(5000);
+ 173              		.loc 1 116 0
+ 174 0058 2148     		ldr	r0, .L8+24
+ 175 005a 4FF40051 		mov	r1, #8192
+ 176 005e 0022     		movs	r2, #0
+ 177 0060 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 178              	.LVL15:
+ 117:Src/main.c    ****   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 15);
+ 179              		.loc 1 117 0
+ 180 0064 41F28830 		movw	r0, #5000
+ 181 0068 FFF7FEFF 		bl	HAL_Delay
+ 182              	.LVL16:
+ 118:Src/main.c    ****   HAL_Delay(2000);
+ 183              		.loc 1 118 0
+ 184 006c 2368     		ldr	r3, [r4]
+ 185 006e 0F25     		movs	r5, #15
+ 186 0070 DD63     		str	r5, [r3, #60]
+ 119:Src/main.c    ****   
+ 187              		.loc 1 119 0
+ 188 0072 4FF4FA60 		mov	r0, #2000
+ 189 0076 FFF7FEFF 		bl	HAL_Delay
+ 190              	.LVL17:
+ 122:Src/main.c    ****   HAL_Delay(2000);
+ 191              		.loc 1 122 0
+ 192 007a 2368     		ldr	r3, [r4]
+ 193 007c 1D64     		str	r5, [r3, #64]
+ 123:Src/main.c    **** 
+ 194              		.loc 1 123 0
+ 195 007e 4FF4FA60 		mov	r0, #2000
+ 196 0082 FFF7FEFF 		bl	HAL_Delay
+ 197              	.LVL18:
+  75:Src/main.c    ****   /* USER CODE END 1 */
+ 198              		.loc 1 75 0
+ 199 0086 0024     		movs	r4, #0
+ARM GAS  /tmp/ccSIf5vS.s 			page 8
+
+
+ 200              	.LVL19:
+ 201              	.L6:
+ 130:Src/main.c    ****     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, speed_dutyCycle_ab);
+ 202              		.loc 1 130 0
+ 203 0088 0134     		adds	r4, r4, #1
+ 204              	.LVL20:
+ 205 008a A4B2     		uxth	r4, r4
+ 206              	.LVL21:
+ 131:Src/main.c    ****     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, steering_dutyCycle_ab);
+ 207              		.loc 1 131 0
+ 208 008c 0E4B     		ldr	r3, .L8
+ 209 008e 1B68     		ldr	r3, [r3]
+ 210 0090 144A     		ldr	r2, .L8+28
+ 211 0092 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 212 0094 DA63     		str	r2, [r3, #60]
+ 132:Src/main.c    **** 
+ 213              		.loc 1 132 0
+ 214 0096 144A     		ldr	r2, .L8+32
+ 215 0098 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 216 009a 1A64     		str	r2, [r3, #64]
+ 134:Src/main.c    ****       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+ 217              		.loc 1 134 0
+ 218 009c 322C     		cmp	r4, #50
+ 219 009e 06D1     		bne	.L4
+ 135:Src/main.c    ****     }
+ 220              		.loc 1 135 0
+ 221 00a0 0F48     		ldr	r0, .L8+24
+ 222 00a2 4FF40051 		mov	r1, #8192
+ 223 00a6 0022     		movs	r2, #0
+ 224 00a8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 225              	.LVL22:
+ 226 00ac 08E0     		b	.L5
+ 227              	.L4:
+ 137:Src/main.c    ****       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+ 228              		.loc 1 137 0
+ 229 00ae 642C     		cmp	r4, #100
+ 230 00b0 06D1     		bne	.L5
+ 138:Src/main.c    ****       LED_counter = 0;
+ 231              		.loc 1 138 0
+ 232 00b2 0B48     		ldr	r0, .L8+24
+ 233 00b4 4FF40051 		mov	r1, #8192
+ 234 00b8 0122     		movs	r2, #1
+ 235 00ba FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 236              	.LVL23:
+ 139:Src/main.c    ****     }
+ 237              		.loc 1 139 0
+ 238 00be 0024     		movs	r4, #0
+ 239              	.LVL24:
+ 240              	.L5:
+ 143:Src/main.c    ****   }
+ 241              		.loc 1 143 0
+ 242 00c0 0A20     		movs	r0, #10
+ 243 00c2 FFF7FEFF 		bl	HAL_Delay
+ 244              	.LVL25:
+ 144:Src/main.c    ****   /* USER CODE END 3 */
+ 245              		.loc 1 144 0
+ 246 00c6 DFE7     		b	.L6
+ARM GAS  /tmp/ccSIf5vS.s 			page 9
+
+
+ 247              	.L9:
+ 248              		.align	2
+ 249              	.L8:
+ 250 00c8 00000000 		.word	htim4
+ 251 00cc 000C0140 		.word	1073810432
+ 252 00d0 00080140 		.word	1073809408
+ 253 00d4 00000000 		.word	huart1
+ 254 00d8 00000000 		.word	.LANCHOR0
+ 255 00dc 00000000 		.word	.LANCHOR1
+ 256 00e0 00100140 		.word	1073811456
+ 257 00e4 00000000 		.word	.LANCHOR2
+ 258 00e8 00000000 		.word	.LANCHOR3
+ 259              		.cfi_endproc
+ 260              	.LFE65:
+ 262              		.section	.text.HAL_UART_RxCpltCallback,"ax",%progbits
+ 263              		.align	2
+ 264              		.global	HAL_UART_RxCpltCallback
+ 265              		.thumb
+ 266              		.thumb_func
+ 268              	HAL_UART_RxCpltCallback:
+ 269              	.LFB67:
+ 184:Src/main.c    **** 
+ 185:Src/main.c    **** /* USER CODE BEGIN 4 */
+ 186:Src/main.c    **** void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) 
+ 187:Src/main.c    **** {
+ 270              		.loc 1 187 0
+ 271              		.cfi_startproc
+ 272              		@ args = 0, pretend = 0, frame = 0
+ 273              		@ frame_needed = 0, uses_anonymous_args = 0
+ 274              		@ link register save eliminated.
+ 275              	.LVL26:
+ 188:Src/main.c    ****   uint8_t brake_ac = 0 ; //0-100
+ 189:Src/main.c    ****   uint8_t gas_ac = 0 ; //0-100
+ 190:Src/main.c    ****   uint8_t dutyCycle_ac = 0;
+ 191:Src/main.c    **** 
+ 192:Src/main.c    ****   uint8_t steering = 49; //0-100
+ 193:Src/main.c    ****   // int32_t stering_deg = 0;
+ 194:Src/main.c    ****   //steering
+ 195:Src/main.c    ****   steering = 10 * (recv_buf[0] - '0') + (recv_buf[1] - '0');
+ 276              		.loc 1 195 0
+ 277 0000 2549     		ldr	r1, .L15
+ 278 0002 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 279 0004 303A     		subs	r2, r2, #48
+ 280 0006 4878     		ldrb	r0, [r1, #1]	@ zero_extendqisi2
+ 281              	.LVL27:
+ 282 0008 02EB8202 		add	r2, r2, r2, lsl #2
+ 283 000c 5300     		lsls	r3, r2, #1
+ 284 000e 0344     		add	r3, r3, r0
+ 285 0010 303B     		subs	r3, r3, #48
+ 286 0012 DBB2     		uxtb	r3, r3
+ 287              	.LVL28:
+ 196:Src/main.c    ****   steering_dutyCycle_ab = 5 + steering * 2 / 10;
+ 288              		.loc 1 196 0
+ 289 0014 5B00     		lsls	r3, r3, #1
+ 290              	.LVL29:
+ 291 0016 214A     		ldr	r2, .L15+4
+ 292              	.LVL30:
+ARM GAS  /tmp/ccSIf5vS.s 			page 10
+
+
+ 293 0018 82FB0323 		smull	r2, r3, r2, r3
+ 294 001c 9B10     		asrs	r3, r3, #2
+ 295 001e 0533     		adds	r3, r3, #5
+ 296 0020 1F4A     		ldr	r2, .L15+8
+ 297 0022 1370     		strb	r3, [r2]
+ 197:Src/main.c    **** 
+ 198:Src/main.c    **** 
+ 199:Src/main.c    **** 
+ 200:Src/main.c    ****   //brake
+ 201:Src/main.c    ****   brake_ac = 10 * (recv_buf[2] - '0') + (recv_buf[3] - '0') + 1;
+ 298              		.loc 1 201 0
+ 299 0024 8A78     		ldrb	r2, [r1, #2]	@ zero_extendqisi2
+ 300 0026 303A     		subs	r2, r2, #48
+ 301 0028 C978     		ldrb	r1, [r1, #3]	@ zero_extendqisi2
+ 302 002a 02EB8202 		add	r2, r2, r2, lsl #2
+ 303 002e 5300     		lsls	r3, r2, #1
+ 304 0030 0B44     		add	r3, r3, r1
+ 305 0032 2F3B     		subs	r3, r3, #47
+ 306 0034 DBB2     		uxtb	r3, r3
+ 307              	.LVL31:
+ 202:Src/main.c    ****   if (brake_ac > 5){
+ 308              		.loc 1 202 0
+ 309 0036 052B     		cmp	r3, #5
+ 310 0038 11D9     		bls	.L11
+ 203:Src/main.c    ****     // HobbyWing 1060 ###########################
+ 204:Src/main.c    ****     if (dutyCycle > 15){
+ 311              		.loc 1 204 0
+ 312 003a 1A4A     		ldr	r2, .L15+12
+ 313 003c B2F90020 		ldrsh	r2, [r2]
+ 314 0040 0F2A     		cmp	r2, #15
+ 315 0042 03DD     		ble	.L12
+ 205:Src/main.c    ****       dutyCycle = 15; // 1.5ms
+ 316              		.loc 1 205 0
+ 317 0044 0F22     		movs	r2, #15
+ 318 0046 174B     		ldr	r3, .L15+12
+ 319              	.LVL32:
+ 320 0048 1A80     		strh	r2, [r3]	@ movhi
+ 321 004a 19E0     		b	.L13
+ 322              	.LVL33:
+ 323              	.L12:
+ 206:Src/main.c    ****     }
+ 207:Src/main.c    ****     else {
+ 208:Src/main.c    ****       dutyCycle = 15 - brake_ac / 20; //100->10, 0->15
+ 324              		.loc 1 208 0
+ 325 004c 164A     		ldr	r2, .L15+16
+ 326 004e A2FB0323 		umull	r2, r3, r2, r3
+ 327              	.LVL34:
+ 328 0052 1B09     		lsrs	r3, r3, #4
+ 329 0054 C3F10F03 		rsb	r3, r3, #15
+ 330 0058 124A     		ldr	r2, .L15+12
+ 331 005a 1380     		strh	r3, [r2]	@ movhi
+ 332 005c 10E0     		b	.L13
+ 333              	.LVL35:
+ 334              	.L11:
+ 209:Src/main.c    ****     }
+ 210:Src/main.c    ****     // HobbyWing 1060 ###########################
+ 211:Src/main.c    **** 
+ARM GAS  /tmp/ccSIf5vS.s 			page 11
+
+
+ 212:Src/main.c    ****     // TB6650 ###################################
+ 213:Src/main.c    ****     // HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_RESET);
+ 214:Src/main.c    ****     // HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_SET);
+ 215:Src/main.c    ****     // brake_ac = brake_ac * htim4.Init.Period / 100;
+ 216:Src/main.c    ****     // dutyCycle = brake_ac;
+ 217:Src/main.c    ****     // TB6650 ###################################
+ 218:Src/main.c    **** 
+ 219:Src/main.c    ****     // accelerat control ########################
+ 220:Src/main.c    ****     // brake_ac = htim4.Init.Period / 100 * brake_ac / 5;
+ 221:Src/main.c    ****     // dutyCycle -= brake_ac;
+ 222:Src/main.c    ****     // accelerat control ########################
+ 223:Src/main.c    ****   }
+ 224:Src/main.c    **** 
+ 225:Src/main.c    ****   //gas pedal
+ 226:Src/main.c    ****   else{
+ 227:Src/main.c    ****     // HobbyWing 1060 ###########################
+ 228:Src/main.c    ****     gas_ac = 10 * (recv_buf[4] - '0') + (recv_buf[5] - '0') + 1;
+ 335              		.loc 1 228 0
+ 336 005e 0E4B     		ldr	r3, .L15
+ 337              	.LVL36:
+ 338 0060 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 339              	.LVL37:
+ 340 0062 303A     		subs	r2, r2, #48
+ 341 0064 5979     		ldrb	r1, [r3, #5]	@ zero_extendqisi2
+ 342              	.LVL38:
+ 343 0066 02EB8202 		add	r2, r2, r2, lsl #2
+ 344 006a 5300     		lsls	r3, r2, #1
+ 345 006c 0B44     		add	r3, r3, r1
+ 346 006e 2F3B     		subs	r3, r3, #47
+ 347 0070 DBB2     		uxtb	r3, r3
+ 348              	.LVL39:
+ 229:Src/main.c    ****     dutyCycle = gas_ac / 20 + 15; //100->20, 0->15
+ 349              		.loc 1 229 0
+ 350 0072 0D4A     		ldr	r2, .L15+16
+ 351 0074 A2FB0323 		umull	r2, r3, r2, r3
+ 352              	.LVL40:
+ 353 0078 1B09     		lsrs	r3, r3, #4
+ 354 007a 0F33     		adds	r3, r3, #15
+ 355 007c 094A     		ldr	r2, .L15+12
+ 356 007e 1380     		strh	r3, [r2]	@ movhi
+ 357              	.LVL41:
+ 358              	.L13:
+ 230:Src/main.c    ****     // HobbyWing 1060 ###########################
+ 231:Src/main.c    **** 
+ 232:Src/main.c    ****     // TB6650 ###################################
+ 233:Src/main.c    ****     // HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_SET);
+ 234:Src/main.c    ****     // HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_RESET);
+ 235:Src/main.c    ****     // dutyCycle_ab = 10 * (recv_buf[4] - '0') + (recv_buf[5] - '0'); 
+ 236:Src/main.c    ****     // dutyCycle_ab = dutyCycle_ab * htim4.Init.Period / 100;
+ 237:Src/main.c    ****     // TB6650 ###################################
+ 238:Src/main.c    **** 
+ 239:Src/main.c    ****     // accelerat control ########################
+ 240:Src/main.c    ****     // dutyCycle_ac = 10 * (recv_buf[4] - '0') + (recv_buf[5] - '0'); 
+ 241:Src/main.c    ****     // dutyCycle_ac = htim4.Init.Period / 100 * dutyCycle_ac / 5;
+ 242:Src/main.c    ****     // dutyCycle += dutyCycle_ac;
+ 243:Src/main.c    ****     // accelerat control ########################
+ 244:Src/main.c    ****   }
+ARM GAS  /tmp/ccSIf5vS.s 			page 12
+
+
+ 245:Src/main.c    **** 
+ 246:Src/main.c    ****   //hand brake
+ 247:Src/main.c    ****   if (recv_buf[6] == '1'){
+ 359              		.loc 1 247 0
+ 360 0080 054B     		ldr	r3, .L15
+ 361 0082 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 362 0084 312B     		cmp	r3, #49
+ 363 0086 02D1     		bne	.L14
+ 248:Src/main.c    ****     // HobbyWing 1060 ###########################
+ 249:Src/main.c    ****     dutyCycle = 15;
+ 364              		.loc 1 249 0
+ 365 0088 0F22     		movs	r2, #15
+ 366 008a 064B     		ldr	r3, .L15+12
+ 367 008c 1A80     		strh	r2, [r3]	@ movhi
+ 368              	.L14:
+ 250:Src/main.c    ****     // HobbyWing 1060 ###########################
+ 251:Src/main.c    **** 
+ 252:Src/main.c    ****     // TB6650 ###################################
+ 253:Src/main.c    ****     // HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_RESET);
+ 254:Src/main.c    ****     // HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_RESET);
+ 255:Src/main.c    ****     // dutyCycle = 0;
+ 256:Src/main.c    ****     // TB6650 ###################################
+ 257:Src/main.c    ****   }
+ 258:Src/main.c    **** 
+ 259:Src/main.c    ****   // HobbyWing 1060 ###########################
+ 260:Src/main.c    ****   speed_dutyCycle_ab = dutyCycle;
+ 369              		.loc 1 260 0
+ 370 008e 054B     		ldr	r3, .L15+12
+ 371 0090 1A88     		ldrh	r2, [r3]
+ 372 0092 064B     		ldr	r3, .L15+20
+ 373 0094 1A70     		strb	r2, [r3]
+ 374 0096 7047     		bx	lr
+ 375              	.L16:
+ 376              		.align	2
+ 377              	.L15:
+ 378 0098 00000000 		.word	.LANCHOR0
+ 379 009c 67666666 		.word	1717986919
+ 380 00a0 00000000 		.word	.LANCHOR3
+ 381 00a4 00000000 		.word	.LANCHOR4
+ 382 00a8 CDCCCCCC 		.word	-858993459
+ 383 00ac 00000000 		.word	.LANCHOR2
+ 384              		.cfi_endproc
+ 385              	.LFE67:
+ 387              		.section	.text.Error_Handler,"ax",%progbits
+ 388              		.align	2
+ 389              		.global	Error_Handler
+ 390              		.thumb
+ 391              		.thumb_func
+ 393              	Error_Handler:
+ 394              	.LFB68:
+ 261:Src/main.c    ****   // HobbyWing 1060 ###########################
+ 262:Src/main.c    **** 
+ 263:Src/main.c    ****   // accelerat control ########################
+ 264:Src/main.c    ****   // if (dutyCycle >= 0 ){
+ 265:Src/main.c    ****   //   HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_SET);
+ 266:Src/main.c    ****   //   HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_RESET);
+ 267:Src/main.c    ****   //   if (dutyCycle > htim4.Init.Period){ dutyCycle = htim4.Init.Period;} 
+ARM GAS  /tmp/ccSIf5vS.s 			page 13
+
+
+ 268:Src/main.c    ****   //   speed_dutyCycle_ab = dutyCycle;
+ 269:Src/main.c    ****   // }
+ 270:Src/main.c    ****   // else{
+ 271:Src/main.c    ****   //   HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_RESET);
+ 272:Src/main.c    ****   //   HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_SET);
+ 273:Src/main.c    ****   //   if (dutyCycle < (-htim4.Init.Period)){ dutyCycle = -htim4.Init.Period;}
+ 274:Src/main.c    ****   //   speed_dutyCycle_ab = -dutyCycle;
+ 275:Src/main.c    ****   // }
+ 276:Src/main.c    ****   // accelerat control ########################
+ 277:Src/main.c    **** 
+ 278:Src/main.c    ****   
+ 279:Src/main.c    **** }
+ 280:Src/main.c    **** /* USER CODE END 4 */
+ 281:Src/main.c    **** 
+ 282:Src/main.c    **** /**
+ 283:Src/main.c    ****   * @brief  This function is executed in case of error occurrence.
+ 284:Src/main.c    ****   * @retval None
+ 285:Src/main.c    ****   */
+ 286:Src/main.c    **** void Error_Handler(void)
+ 287:Src/main.c    **** {
+ 395              		.loc 1 287 0
+ 396              		.cfi_startproc
+ 397              		@ args = 0, pretend = 0, frame = 0
+ 398              		@ frame_needed = 0, uses_anonymous_args = 0
+ 399              		@ link register save eliminated.
+ 400 0000 7047     		bx	lr
+ 401              		.cfi_endproc
+ 402              	.LFE68:
+ 404              		.global	recv_size
+ 405              		.global	recv_buf
+ 406              		.global	steering_dutyCycle_ab
+ 407              		.global	speed_dutyCycle_ab
+ 408              		.global	dutyCycle
+ 409 0002 00BF     		.section	.data.speed_dutyCycle_ab,"aw",%progbits
+ 410              		.set	.LANCHOR2,. + 0
+ 413              	speed_dutyCycle_ab:
+ 414 0000 0F       		.byte	15
+ 415              		.section	.data.recv_size,"aw",%progbits
+ 416              		.align	1
+ 417              		.set	.LANCHOR1,. + 0
+ 420              	recv_size:
+ 421 0000 0900     		.short	9
+ 422              		.section	.bss.recv_buf,"aw",%nobits
+ 423              		.align	2
+ 424              		.set	.LANCHOR0,. + 0
+ 427              	recv_buf:
+ 428 0000 00000000 		.space	9
+ 428      00000000 
+ 428      00
+ 429              		.section	.bss.dutyCycle,"aw",%nobits
+ 430              		.align	1
+ 431              		.set	.LANCHOR4,. + 0
+ 434              	dutyCycle:
+ 435 0000 0000     		.space	2
+ 436              		.section	.data.steering_dutyCycle_ab,"aw",%progbits
+ 437              		.set	.LANCHOR3,. + 0
+ 440              	steering_dutyCycle_ab:
+ARM GAS  /tmp/ccSIf5vS.s 			page 14
+
+
+ 441 0000 0F       		.byte	15
+ 442              		.text
+ 443              	.Letext0:
+ 444              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 445              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 446              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 447              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 448              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h"
+ 449              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h"
+ 450              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 451              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 452              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 453              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 454              		.file 12 "Drivers/CMSIS/Include/core_cm3.h"
+ 455              		.file 13 "Inc/tim.h"
+ 456              		.file 14 "Inc/usart.h"
+ 457              		.file 15 "Inc/gpio.h"
+ 458              		.file 16 "Inc/dma.h"
+ 459              		.file 17 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  /tmp/ccSIf5vS.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccSIf5vS.s:19     .text.SystemClock_Config:0000000000000000 $t
+     /tmp/ccSIf5vS.s:24     .text.SystemClock_Config:0000000000000000 SystemClock_Config
+     /tmp/ccSIf5vS.s:99     .text.main:0000000000000000 $t
+     /tmp/ccSIf5vS.s:104    .text.main:0000000000000000 main
+     /tmp/ccSIf5vS.s:250    .text.main:00000000000000c8 $d
+     /tmp/ccSIf5vS.s:263    .text.HAL_UART_RxCpltCallback:0000000000000000 $t
+     /tmp/ccSIf5vS.s:268    .text.HAL_UART_RxCpltCallback:0000000000000000 HAL_UART_RxCpltCallback
+     /tmp/ccSIf5vS.s:378    .text.HAL_UART_RxCpltCallback:0000000000000098 $d
+     /tmp/ccSIf5vS.s:388    .text.Error_Handler:0000000000000000 $t
+     /tmp/ccSIf5vS.s:393    .text.Error_Handler:0000000000000000 Error_Handler
+     /tmp/ccSIf5vS.s:420    .data.recv_size:0000000000000000 recv_size
+     /tmp/ccSIf5vS.s:427    .bss.recv_buf:0000000000000000 recv_buf
+     /tmp/ccSIf5vS.s:440    .data.steering_dutyCycle_ab:0000000000000000 steering_dutyCycle_ab
+     /tmp/ccSIf5vS.s:413    .data.speed_dutyCycle_ab:0000000000000000 speed_dutyCycle_ab
+     /tmp/ccSIf5vS.s:434    .bss.dutyCycle:0000000000000000 dutyCycle
+     /tmp/ccSIf5vS.s:416    .data.recv_size:0000000000000000 $d
+     /tmp/ccSIf5vS.s:423    .bss.recv_buf:0000000000000000 $d
+     /tmp/ccSIf5vS.s:430    .bss.dutyCycle:0000000000000000 $d
+                     .debug_frame:0000000000000010 $d
+
+UNDEFINED SYMBOLS
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_Init
+MX_GPIO_Init
+MX_DMA_Init
+MX_TIM4_Init
+MX_USART1_UART_Init
+HAL_TIM_PWM_Start
+HAL_GPIO_WritePin
+HAL_UART_Receive_DMA
+HAL_Delay
+htim4
+huart1
