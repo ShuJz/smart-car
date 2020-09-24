@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "gcc",
+            "includePath": [
+                "/home/jingzhe/applications/arm_toolchain/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include",
+                "${workspaceFolder}/Inc",
+                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+                "${workspaceFolder}/Drivers/CMSIS/Include"
+            ],
+            "defines": ["GCC_COMPILE=1", "WM_W600", "_DEBUG"],
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Wall -fdata-sections -ffunction-sections",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "${workspaceFolder}"
+                ]
+            }
+        }
+    ],
+    "version": 4
+}

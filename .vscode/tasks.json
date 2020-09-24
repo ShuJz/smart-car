@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "openocd",
+            "type": "shell",
+            "command": "openocd -f openocd.cfg && exit"
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cd build && make clean && make && exit",
+            "problemMatcher": []
+        },
+        {
+            "label": "telnet localhost 4444",
+            "type": "shell",
+            "command": "telnet localhost 4444 && exit"
+        },
+
+        {
+            "label": "build_openocd",
+            "dependsOn": [
+                "build",
+                "openocd"
+            ]
+        }
+    ],
+    }

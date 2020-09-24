@@ -21,13 +21,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "mpu6050_hw.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,6 +64,7 @@ uint8_t speed_dutyCycle_ab = 15;  //absolut dutyCycle
 uint8_t steering_dutyCycle_ab = 15;  //absolut dutyCycle
 uint8_t recv_buf[9] = {0};
 uint16_t recv_size = 9;
+short accData[3]={0};  // accelerator data from mpu6050
 /* USER CODE END 0 */
 
 /**
@@ -96,14 +98,12 @@ int main(void)
   MX_DMA_Init();
   MX_TIM4_Init();
   MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  
+  // MPU6050_Init();
+
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_3);     //Motor PWM
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);     //Steering motor PWM
-  HAL_GPIO_WritePin(Motor1a_GPIO_Port, Motor1a_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(Motor1b_GPIO_Port, Motor1b_Pin, GPIO_PIN_RESET);
-
-  HAL_GPIO_WritePin(STBY_GPIO_Port, STBY_Pin, GPIO_PIN_SET); //Motor STBY
 
   HAL_UART_Receive_DMA(&huart1, recv_buf, recv_size); //UART1
 
@@ -121,7 +121,11 @@ int main(void)
   //Initial steering servo motor
   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 15);
   HAL_Delay(2000);
-
+  #ifdef DEBUG
+    Usart_SendString((uint8_t *)"Usart_SendString, Debug mode\n");
+    int mpu6050 = MPU6050ReadID();
+    printf("Debuge mode, printf can be used!!!(printf)\n");
+  #endif
   while (1)
   {
     /* USER CODE END WHILE */
@@ -140,6 +144,17 @@ int main(void)
     }
     
 
+    MPU6050ReadAcc(accData);
+    #ifdef DEBUG
+      if (mpu6050 == 1){
+        Usart_SendString((uint8_t *)"accData is: ");
+        for (int i = 0; i<3; i++)
+          Usart_SendString((uint8_t *) accData[i]);
+        Usart_SendString((uint8_t *)'\n');
+      }
+      
+    #endif
+
     HAL_Delay(10);
   }
   /* USER CODE END 3 */
@@ -154,7 +169,7 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -167,7 +182,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -185,6 +200,13 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) 
 {
+  #ifdef DEBUG
+    Usart_SendString((uint8_t *)recv_buf);
+    printf("UART data is (printf): ");
+    for (int i = 0; i<9; i++)
+      printf("%d, ", *(recv_buf + i));
+    printf('(printf)\n');
+  #endif
   uint8_t brake_ac = 0 ; //0-100
   uint8_t gas_ac = 0 ; //0-100
   uint8_t dutyCycle_ac = 0;
@@ -300,7 +322,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
