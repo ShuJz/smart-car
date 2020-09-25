@@ -7,7 +7,7 @@
 #include "stm32f1xx_hal.h"
 
 //模块的A0引脚接GND，IIC的7位地址为0x68，若接到VCC，需要改为0x69
-#define MPU6050_SLAVE_ADDRESS  (0x68<<1)      //MPU6050 address
+#define MPU6050_SLAVE_ADDRESS  (0x68<<1)     //MPU6050 address
 
 
 #define MPU6050_WHO_AM_I        0x75
@@ -377,6 +377,7 @@ void MPU6050ReadGyro(short *gyroData);
 void MPU6050ReadAcc(short *accData);
 void MPU6050_ReturnTemp(float *Temperature);
 uint8_t MPU6050ReadID(void);
+void MPU6050ReadConfigRegs(void);
 void PMU6050_ReadData(uint8_t reg_add,unsigned char*Read,uint8_t num);
 void PMU6050_WriteReg(uint8_t reg_add,uint8_t reg_dat);
 

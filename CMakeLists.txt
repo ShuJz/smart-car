@@ -69,6 +69,7 @@ set(SRC
     ${STM32_CMAKE_DIR}/Src/tim.c
     ${STM32_CMAKE_DIR}/Src/usart.c
     ${STM32_CMAKE_DIR}/Src/main.c
+    ${STM32_CMAKE_DIR}/Src/retarget.c
     ${STM32_CMAKE_DIR}/Src/stm32f1xx_it.c
     ${STM32_CMAKE_DIR}/Src/stm32f1xx_hal_msp.c
     ${STM32_CMAKE_DIR}/Src/system_stm32f1xx.c

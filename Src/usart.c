@@ -21,21 +21,8 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#define UART_Printf_BUFF_SIZE  500
-static uint8_t UART_Printf_Buff[UART_Printf_BUFF_SIZE];
-static uint32_t UART_Printf_BuffIndex;
-
-#ifdef __GNUC__
-	#define PUTCHAR_PROTOTYPE  int __io_putchar(int ch)
-#else
-	#define PUTCHAR_PROTOTYPE  int fputc(int ch, FILE *stream)
-#endif
-PUTCHAR_PROTOTYPE
-{
-	UART_Printf_Buff[UART_Printf_BuffIndex] = (uint8_t) ch;
-	UART_Printf_BuffIndex ++;
-	return ch;
-}
+#include "stdio.h"
+#include "retarget.h"
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -151,21 +138,6 @@ void Usart_SendString(uint8_t *str)
         HAL_UART_Transmit( &huart1,(uint8_t *)(str + k) ,1,1000);
         k++;
     } while (*(str + k)!='\0');
-}
-
-int fputc(int ch, FILE *f)
-{
-	// HAL_UART_Transmit_DMA(&huart1, (uint8_t *) &ch, 1);
-  uint8_t temp[1]={ch};
-  HAL_UART_Transmit(&huart1, temp, 1, 1000);
-	return (ch);
-}
-
-int fgetc(FILE *f)
-{		
-	int ch;
-	HAL_UART_Receive(&huart1, (uint8_t *) &ch, 1, 1000);	
-	return (ch);
 }
 /* USER CODE END 1 */
 

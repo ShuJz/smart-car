@@ -83,7 +83,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  RetargetInit(&huart1);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -100,18 +100,13 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  // MPU6050_Init();
-
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_3);     //Motor PWM
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);     //Steering motor PWM
-
   HAL_UART_Receive_DMA(&huart1, recv_buf, recv_size); //UART1
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
   //Initial motor controller HobbyWing 1060
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
   HAL_Delay(5000);
@@ -121,9 +116,12 @@ int main(void)
   //Initial steering servo motor
   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 15);
   HAL_Delay(2000);
+
+  //Initial MPU6050
+  MPU6050_Init();
   #ifdef DEBUG
-    Usart_SendString((uint8_t *)"Usart_SendString, Debug mode\n");
     int mpu6050 = MPU6050ReadID();
+    MPU6050ReadConfigRegs()
     printf("Debuge mode, printf can be used!!!(printf)\n");
   #endif
   while (1)
@@ -147,10 +145,7 @@ int main(void)
     MPU6050ReadAcc(accData);
     #ifdef DEBUG
       if (mpu6050 == 1){
-        Usart_SendString((uint8_t *)"accData is: ");
-        for (int i = 0; i<3; i++)
-          Usart_SendString((uint8_t *) accData[i]);
-        Usart_SendString((uint8_t *)'\n');
+        printf("accData is: %d, %d, %d\n"), accData[0], accData[1], accData[2];
       }
       
     #endif
