@@ -26,9 +26,8 @@
 
 #include "packet.h"
 #include "log.h"
-#include "stm32f10x.h"
-#include "./usart/bsp_usart.h"
-#include "./i2c/bsp_i2c.h"
+#include "usart.h"
+#include "i2c.h"
 
 #define BUF_SIZE        (256)
 #define PACKET_LENGTH   (23)
@@ -39,11 +38,9 @@
 
 int fputcc(int ch)
 {
-		/* 发送一个字节数据到USART1 */
-		USART_SendData(DEBUG_USARTx, (uint8_t) ch);
+		Usart_SendString((uint8_t) ch);
 		
-		/* 等待发送完毕 */
-		while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_TXE) == RESET);		
+		while (__HAL_UART_GET_FLAG (DEBUG_USARTx, UART_FLAG_RXNE) == RESET);		
 	
 		return (ch);
 }

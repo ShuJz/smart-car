@@ -37,8 +37,8 @@
  * min(int a, int b)
  */
 #if defined EMPL_TARGET_STM32F4
-#include "./i2c/bsp_i2c.h"  
-#include "./systick/bsp_SysTick.h"
+#include "i2c.h"  
+#include "sys_tick.h"
 //#include "main.h"
 #include "log.h"
 //#include "board-st_discovery.h"
@@ -50,7 +50,23 @@
 #define log_i       MPL_LOGI
 #define log_e       MPL_LOGE
 #define min(a,b) ((a<b)?a:b)
+
+
+#elif defined EMPL_TARGET_STM32F1
+#include "i2c.h"  
+#include "sys_tick.h"
+//#include "main.h"
+#include "log.h"
+//#include "board-st_discovery.h"
    
+#define i2c_write   Sensors_I2C_WriteRegister
+#define i2c_read    Sensors_I2C_ReadRegister 
+#define delay_ms    mdelay
+#define get_ms      get_tick_count
+#define log_i       MPL_LOGI
+#define log_e       MPL_LOGE
+#define min(a,b) ((a<b)?a:b)
+
 #elif defined MOTION_DRIVER_TARGET_MSP430
 #include "msp430.h"
 #include "msp430_i2c.h"
@@ -459,7 +475,7 @@ enum lp_accel_rate_e {
 
 #if defined MPU6050
 const struct gyro_reg_s reg = {
-    .who_am_i       = 0x75,		//这种形式的结构体赋值，需要在options的C/C++选项中勾选C99 Mode 选项
+    .who_am_i       = 0x75,		//锟斤拷锟斤拷锟斤拷式锟侥结构锟藉赋值锟斤拷锟斤拷要锟斤拷options锟斤拷C/C++选锟斤拷锟叫癸拷选C99 Mode 选锟斤拷
     .rate_div       = 0x19,
     .lpf            = 0x1A,
     .prod_id        = 0x0C,
@@ -772,7 +788,7 @@ int mpu_init(struct int_param_s *int_param)
     if (mpu_configure_fifo(0))
         return -1;
 
-#ifndef EMPL_TARGET_STM32F4    
+#if (!defined EMPL_TARGET_STM32F4) && (!defined EMPL_TARGET_STM32F1)
     if (int_param)
         reg_int_cb(int_param);
 #endif

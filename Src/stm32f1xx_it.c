@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
- 
+ #define MPU_IRQHandler EXTI9_5_IRQHandler
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -183,7 +183,8 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+  TimingDelay_Decrement();
+  TimeStamp_Increment();
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -227,6 +228,14 @@ void USART1_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+void MPU_IRQHandler(void)
+{
+  if (__HAL_GPIO_EXTI_GET_IT(MPU_INT_GPIO_PIN) != RESET) {
 
+    /* Handle new gyro*/
+    gyro_data_ready_cb();
+    __HAL_GPIO_EXTI_CLEAR_IT(MPU_INT_GPIO_PIN);
+  }
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

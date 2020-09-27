@@ -1,7 +1,8 @@
 
 # generate flags from user variables
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-set(DBG_FLAGS "-g3 -gdwarf-2 -O0")
+# set(DBG_FLAGS "-g3 -gdwarf-2 -O0")
+set(DBG_FLAGS "-g -gdwarf-2 -O2")
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
 set(DBG_FLAGS "-O0")
 endif()

@@ -37,7 +37,25 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned long u32;
+typedef unsigned long long u64;
 
+typedef unsigned char __u8;
+typedef unsigned short __u16;
+typedef unsigned long __u32;
+typedef unsigned long long __u64;
+
+typedef char s8;
+typedef short s16;
+typedef long s32;
+typedef long long s64;
+
+// typedef char __s8;
+// typedef short __s16;
+// typedef long __s32;
+// typedef long long __s64;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -60,6 +78,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
+
+#define MPU_INT_GPIO_PIN GPIO_PIN_11
+#define NumOfTask 1
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

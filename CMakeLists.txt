@@ -59,6 +59,7 @@ set(PROJ_DRIVERS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Drivers)
 # common libraries
 add_subdirectory(${PROJ_DRIVERS_PATH}/CMSIS ${CMAKE_BINARY_DIR}/libraries/CMSIS)
 add_subdirectory(${PROJ_DRIVERS_PATH}/STM32F1xx_HAL_Driver ${CMAKE_BINARY_DIR}/libraries/STM32F1xx_HAL_Driver)
+add_subdirectory(${PROJ_DRIVERS_PATH}/MPU6050 ${CMAKE_BINARY_DIR}/libraries/MPU6050)
 
 # STM32CubeMX generated source files
 set(SRC
@@ -66,8 +67,10 @@ set(SRC
     ${STM32_CMAKE_DIR}/Src/dma.c
     ${STM32_CMAKE_DIR}/Src/i2c.c
     ${STM32_CMAKE_DIR}/Src/mpu6050_hw.c
+    ${STM32_CMAKE_DIR}/Src/mpu6050_dmp.c
     ${STM32_CMAKE_DIR}/Src/tim.c
     ${STM32_CMAKE_DIR}/Src/usart.c
+    ${STM32_CMAKE_DIR}/Src/sys_tick.c
     ${STM32_CMAKE_DIR}/Src/main.c
     ${STM32_CMAKE_DIR}/Src/retarget.c
     ${STM32_CMAKE_DIR}/Src/stm32f1xx_it.c
@@ -77,7 +80,7 @@ set(SRC
 )
 add_executable(${ELF_TARGET} ${SRC})
 target_compile_definitions(${ELF_TARGET} PUBLIC -D${MCU_FAMILY})
-target_link_libraries(${ELF_TARGET} PUBLIC cmsis stm32f1xx_hal -lc -lm -lnosys)
+target_link_libraries(${ELF_TARGET} PUBLIC cmsis stm32f1xx_hal mpu6050_mlp -lc -lm -lnosys)
 target_link_libraries(${ELF_TARGET} PRIVATE -T${LINKER_SCRIPT} ${EXTRA_LINK_FLAGS})
 target_include_directories(${ELF_TARGET} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Inc>)

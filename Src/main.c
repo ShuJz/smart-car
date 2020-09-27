@@ -29,6 +29,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "mpu6050_hw.h"
+#include "mpu6050_dmp.h"
+#include "sys_tick.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,7 +92,8 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  SysTick_Init();
+  SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -118,10 +121,11 @@ int main(void)
   HAL_Delay(2000);
 
   //Initial MPU6050
-  MPU6050_Init();
+  // MPU6050_Init();
+  mpu6050_init();
   #ifdef DEBUG
     int mpu6050 = MPU6050ReadID();
-    MPU6050ReadConfigRegs()
+    MPU6050ReadConfigRegs();
     printf("Debuge mode, printf can be used!!!(printf)\n");
   #endif
   while (1)
@@ -142,11 +146,12 @@ int main(void)
     }
     
 
-    MPU6050ReadAcc(accData);
     #ifdef DEBUG
-      if (mpu6050 == 1){
-        printf("accData is: %d, %d, %d\n"), accData[0], accData[1], accData[2];
-      }
+      mpu6050_run();
+      // MPU6050ReadAcc(accData);
+      // if (mpu6050 == 1){
+      //   printf("accData is: %d, %d, %d\n"), accData[0], accData[1], accData[2];
+      // }
       
     #endif
 
