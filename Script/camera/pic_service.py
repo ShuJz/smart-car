@@ -1,4 +1,10 @@
 # -*- coding: UTF-8 -*-
+
+"""
+Picture Service:
+create a server on host, process the image sent by client. or
+create a client on slave, send image to host.
+"""
 import socket
 import struct
 import threading
@@ -11,17 +17,17 @@ class PIC_Service():
     def __init__(self, mode='sever', debug=False):
 
         self.debug = debug
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 定义socket类型
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # set socket
         # for sever
         if mode=='sever':
             host = '0.0.0.0'
             port = 8000
-            self.s.bind((host, port))  # 绑定需要监听的Ip和端口号，tuple格式
+            self.s.bind((host, port))  # binding host ip and port. tuple
             self.s.listen(5)
 
         # for client
         elif mode=='client':
-            self.s.connect(('192.168.0.206', 8000))
+            self.s.connect(('0.0.0.0', 8000))
 
     def get_connection(self):
         connection, address = self.s.accept()
@@ -31,6 +37,9 @@ class PIC_Service():
     def get_socket_handle(self):
         return self.s
 
+    """
+    receive binary data from client return image.
+    """
     def sever(self, connection, address):
         i = 0
         try:
@@ -38,20 +47,18 @@ class PIC_Service():
                 connection.settimeout(600)
                 fileinfo_size = struct.calcsize('1q')
                 buf = connection.recv(fileinfo_size)
-                # print(buf)
-                if buf:  # 如果不加这个if，第一个文件传输完成后会自动走到下一句
+                if buf:
                     filesize = struct.unpack('1q', buf)[0]
                     if filesize < 0 or filesize > 200000:
                         continue
                     if self.debug:
                         print('filesize is %s' % (filesize))
-                    recvd_size = 0  # 定义接收了的文件大小
+                    recvd_size = 0
                     data = b''
                     while recvd_size != filesize:
                         if filesize - recvd_size >= 1024:
                             rdata = connection.recv(1024)
                             recvd_size += len(rdata)
-                        # elif filesize - recvd_size <1024 and filesize - recvd_size > 0:
                         else:
                             print(filesize - recvd_size)
                             rdata = connection.recv(filesize - recvd_size)
@@ -59,10 +66,13 @@ class PIC_Service():
                         data += rdata
 
                     img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_GRAYSCALE)
-                    cv2.imshow('obstacle_detection', img)
-                    key = cv2.waitKey(30)
+
                     if self.debug:
+                        cv2.imshow('obstacle_detection', img)
+                        key = cv2.waitKey(1)
                         print('receive done')
+                    else:
+                        yield img
                 i += 1
         except socket.timeout:
             connection.close()
@@ -70,8 +80,11 @@ class PIC_Service():
             connection.close()
             cv2.destroyAllWindows()
 
+    """
+    send image to server.
+    """
     def client_send(self, image):
-        fileinfo_size = struct.calcsize('1q')  # 定义打包规则
+        fileinfo_size = struct.calcsize('1q')  # package rule
         if len(image) > 0:
             img_byte = np.array(cv2.imencode(".jpg", image)[1]).tobytes()
             size = len(img_byte)  # don't use sys.getsizeof()
@@ -82,6 +95,9 @@ class PIC_Service():
                 print('client filesize: ', size)
                 print('send over...')
 
+    """
+    test client
+    """
     def client_test(self):
         from picamera import PiCamera
         from picamera.array import PiRGBArray
@@ -101,15 +117,17 @@ class PIC_Service():
             self.s.close()
             camera.close()
 
+    """
+    test server
+    """
     def sever_test(self):
         try:
             while True:
-                print("开始接收图片")
+                print("Start receive image")
                 connection, address = self.get_connection()
                 print('Connected by ', address)
-                thread = threading.Thread(target=self.sever, args=(connection, address))  # 使用threading也可以
+                thread = threading.Thread(target=self.sever, args=(connection, address))
                 thread.start()
-                # threading.start_new_thread(conn_thread, (connection, address))
         finally:
             self.s.close()
 
