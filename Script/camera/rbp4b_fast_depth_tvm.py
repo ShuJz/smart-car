@@ -16,7 +16,7 @@ mp.use("pdf")
 
 class Fast_Depth():
     def __init__(self):
-        model_dir = 'Script/camera/tvm_depth_compiled/tx2_cpu_mobilenet_nnconv5dw_skipadd_pruned'
+        model_dir = 'Script/camera/tvm_depth_compiled/rbp4b_cpu_mobilenet_nnconv5dw_skipadd_pruned'
         # import compiled graph
         print("=> [TVM on RBP4B] using model files in {}".format(model_dir))
         assert (os.path.isdir(model_dir))
@@ -93,17 +93,20 @@ def test():
     rawCapture = PiRGBArray(camera, size=(224, 224))
     # allow the camera to warmup
     time.sleep(2)
+
     depth_detecter = Fast_Depth()
+    print('depth detector initial successfully')
     try:
         # capture frames from the camera
         for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
             t0 = time.time()
             img = frame.array
-            img = cv2.cvtColor(img.astype('uint8'), cv2.COLOR_BGR2GRAY)
+            img = cv2.cvtColor(img.astype('uint8'), cv2.COLOR_BGR2RGB)
 
             depth_img = depth_detecter.get_depth(img)
-            depth_np_color = depth_detecter.get_color_img(depth_img)
 
+            depth_np_color = depth_detecter.get_color_img(depth_img)
+            depth_np_color = cv2.cvtColor(depth_np_color.astype('uint8'), cv2.COLOR_BGR2RGB)
             cv2.imshow('face_detecter', depth_np_color)
 
             k = cv2.waitKey(1) & 0xff

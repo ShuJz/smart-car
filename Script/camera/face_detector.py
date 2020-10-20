@@ -10,7 +10,7 @@ import cv2
 
 class Face_Detecter():
     def __init__(self):
-        self.faceCascade = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_default.xml')
+        self.faceCascade = cv2.CascadeClassifier('Script/camera/haarcascades/haarcascade_frontalface_default.xml')
         self.scaleFactor = 1.2
         self.minNeighbors = 5
         self.minSize = (20, 20)
@@ -74,7 +74,7 @@ def test():
 
     finally:
         camera.close()
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":

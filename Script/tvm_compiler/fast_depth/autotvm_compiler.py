@@ -182,6 +182,7 @@ def tune_tasks(
     early_stopping=None,
     log_filename="tuning.log",
     use_transfer_learning=True,
+    try_spatial_pack_depthwise=True,
 ):
     # create tmp log file
     tmp_log_file = log_filename + ".tmp"
@@ -191,6 +192,8 @@ def tune_tasks(
     for i, tsk in enumerate(reversed(tasks)):
         prefix = "[Task %2d/%2d] " % (i + 1, len(tasks))
 
+        if try_spatial_pack_depthwise:
+            tuner = 'xgb_knob'
         # create tuner
         if tuner == "xgb" or tuner == "xgb-rank":
             tuner_obj = XGBTuner(tsk, loss_type="rank")
