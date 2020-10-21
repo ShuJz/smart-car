@@ -18,7 +18,6 @@ set(MPU6050_DMP_SRC
 
 add_library(mpu6050_mlp ${MPU6050_DMP_SRC})
 target_compile_definitions(mpu6050_mlp PUBLIC -DEMPL_TARGET_STM32F1 -DEMPL -DUSE_DMP -DMPU6050 -DREMOVE_LOGGING -DMPL_LOG_NDEBUG=1)
-# target_link_libraries(mpu6050_dmp ${CMAKE_CURRENT_SOURCE_DIR}/mpl/liblibmplmpu.a stm32f1xx_hal -O2 -Wall -Wunused-function -Wa,-adhlns="$@.lst" -c -fmessage-length=0 -mcpu=cortex-m3 -mthumb -g -gdwarf-2)
 target_link_libraries(mpu6050_mlp ${CMAKE_CURRENT_SOURCE_DIR}/mpl/liblibmplmpu.a stm32f1xx_hal)
 target_include_directories(mpu6050_mlp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/mpl>

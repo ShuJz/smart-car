@@ -36,7 +36,7 @@ extern I2C_HandleTypeDef hi2c1;
 #define I2Cx_FLAG_TIMEOUT ((uint32_t) 1000) //0x1100
 
 //MPU6050的AD0引脚接GND时，地址为0x68 ,接3.3V时，地址为0x69，注意要匹配。
-#define MPU6050_ADDR   0x68
+#define MPU6050_ADDR   (0x68<<1)
 
 
 /*********************软件IIC使用的宏****************************/

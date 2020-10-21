@@ -37,12 +37,11 @@
 #define PACKET_DATA     (3)
 
 int fputcc(int ch)
-{
-		Usart_SendString((uint8_t) ch);
-		
-		while (__HAL_UART_GET_FLAG (DEBUG_USARTx, UART_FLAG_RXNE) == RESET);		
-	
-		return (ch);
+{   
+    HAL_StatusTypeDef hstatus;
+    hstatus = HAL_UART_Transmit(DEBUG_USARTx,(uint8_t *) &ch ,1,1000);
+	// while (hstatus != HAL_OK);	
+	return (ch);
 }
 
 /**

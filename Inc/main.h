@@ -78,11 +78,11 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
-
-#define MPU_INT_GPIO_PIN GPIO_PIN_11
-#define NumOfTask 1
+#define EXTI_MPU6050_Pin GPIO_PIN_11
+#define EXTI_MPU6050_GPIO_Port GPIOA
+#define EXTI_MPU6050_EXTI_IRQn EXTI15_10_IRQn
 /* USER CODE BEGIN Private defines */
-
+#define NumOfTask 1
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

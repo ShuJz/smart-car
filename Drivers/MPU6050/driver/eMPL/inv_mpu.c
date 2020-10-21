@@ -741,7 +741,7 @@ int mpu_init(struct int_param_s *int_param)
     /* Wake up chip. */
     data[0] = 0x00;
     if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_1, 1, data))
-        return -1;
+        return -2;
 
    st.chip_cfg.accel_half = 0;
 
@@ -1668,7 +1668,7 @@ int mpu_set_sensors(unsigned char sensors)
         data |= BIT_STBY_XYZA;
     if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_2, 1, &data)) {
         st.chip_cfg.sensors = 0;
-        return -1;
+        return -2;
     }
 
     if (sensors && (sensors != INV_XYZ_ACCEL))
@@ -1683,7 +1683,7 @@ int mpu_set_sensors(unsigned char sensors)
         mpu_set_bypass(0);
 #else
     if (i2c_read(st.hw->addr, st.reg->user_ctrl, 1, &user_ctrl))
-        return -1;
+        return -3;
     /* Handle AKM power management. */
     if (sensors & INV_XYZ_COMPASS) {
         data = AKM_SINGLE_MEASUREMENT;
@@ -1697,10 +1697,10 @@ int mpu_set_sensors(unsigned char sensors)
     else
         user_ctrl &= ~BIT_DMP_EN;
     if (i2c_write(st.hw->addr, st.reg->s1_do, 1, &data))
-        return -1;
+        return -4;
     /* Enable/disable I2C master mode. */
     if (i2c_write(st.hw->addr, st.reg->user_ctrl, 1, &user_ctrl))
-        return -1;
+        return -5;
 #endif
 #endif
 
@@ -1830,22 +1830,23 @@ int mpu_read_fifo_stream(unsigned short length, unsigned char *data,
 {
     unsigned char tmp[2];
     unsigned short fifo_count;
-    if (!st.chip_cfg.dmp_on)
+    if (!st.chip_cfg.dmp_on){
         return -1;
+    } 
     if (!st.chip_cfg.sensors)
-        return -1;
+        return -7;
 
     if (i2c_read(st.hw->addr, st.reg->fifo_count_h, 2, tmp))
-        return -1;
+        return -3;
     fifo_count = (tmp[0] << 8) | tmp[1];
     if (fifo_count < length) {
         more[0] = 0;
-        return -1;
+        return -4;
     }
     if (fifo_count > (st.hw->max_fifo >> 1)) {
         /* FIFO is 50% full, better check overflow bit. */
         if (i2c_read(st.hw->addr, st.reg->int_status, 1, tmp))
-            return -1;
+            return -5;
         if (tmp[0] & BIT_FIFO_OVERFLOW) {
             mpu_reset_fifo();
             return -2;
@@ -1853,7 +1854,7 @@ int mpu_read_fifo_stream(unsigned short length, unsigned char *data,
     }
 
     if (i2c_read(st.hw->addr, st.reg->fifo_r_w, length, data))
-        return -1;
+        return -6;
     more[0] = fifo_count / length - 1;
     return 0;
 }
@@ -2801,19 +2802,19 @@ int mpu_write_mem(unsigned short mem_addr, unsigned short length,
     if (!data)
         return -1;
     if (!st.chip_cfg.sensors)
-        return -1;
+        return -2;
 
     tmp[0] = (unsigned char)(mem_addr >> 8);
     tmp[1] = (unsigned char)(mem_addr & 0xFF);
 
     /* Check bank boundaries. */
     if (tmp[1] + length > st.hw->bank_size)
-        return -1;
+        return -3;
 
     if (i2c_write(st.hw->addr, st.reg->bank_sel, 2, tmp))
-        return -1;
+        return -4;
     if (i2c_write(st.hw->addr, st.reg->mem_r_w, length, data))
-        return -1;
+        return -5;
     return 0;
 }
 
@@ -2872,13 +2873,17 @@ int mpu_load_firmware(unsigned short length, const unsigned char *firmware,
         return -1;
 
     if (!firmware)
-        return -1;
+        return -3;
     for (ii = 0; ii < length; ii += this_write) {
         this_write = min(LOAD_CHUNK, length - ii);
-        if (mpu_write_mem(ii, this_write, (unsigned char*)&firmware[ii]))
-            return -1;
+        short res;
+        res = mpu_write_mem(ii, this_write, (unsigned char*)&firmware[ii]);
+        if (res){
+            return -4;
+        }
+            
         if (mpu_read_mem(ii, this_write, cur))
-            return -1;
+            return -5;
         if (memcmp(firmware+ii, cur, this_write))
             return -2;
     }
@@ -2887,7 +2892,7 @@ int mpu_load_firmware(unsigned short length, const unsigned char *firmware,
     tmp[0] = start_addr >> 8;
     tmp[1] = start_addr & 0xFF;
     if (i2c_write(st.hw->addr, st.reg->prgm_start_h, 2, tmp))
-        return -1;
+        return -6;
 
     st.chip_cfg.dmp_loaded = 1;
     st.chip_cfg.dmp_sample_rate = sample_rate;

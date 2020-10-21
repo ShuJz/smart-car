@@ -12,11 +12,12 @@ void SysTick_Init(void)
 	 * SystemFrequency / 100000	 10us中断一次
 	 * SystemFrequency / 1000000 1us中断一次
 	 */
-    if (HAL_SYSTICK_Config(SystemCoreClock / 100000))
+    if (HAL_SYSTICK_Config(SystemCoreClock / 1000)) //100000
 	{ 
 		/* Capture error */ 
 		while (1);
 	}
+	SysTick->CTRL &= ~ SysTick_CTRL_ENABLE_Msk;
 }
 
 void mdelay(unsigned long nTime)

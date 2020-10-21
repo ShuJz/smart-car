@@ -63,6 +63,7 @@ add_subdirectory(${PROJ_DRIVERS_PATH}/MPU6050 ${CMAKE_BINARY_DIR}/libraries/MPU6
 
 # STM32CubeMX generated source files
 set(SRC
+    ${STM32_CMAKE_DIR}/Src/exti.c
     ${STM32_CMAKE_DIR}/Src/gpio.c
     ${STM32_CMAKE_DIR}/Src/dma.c
     ${STM32_CMAKE_DIR}/Src/i2c.c

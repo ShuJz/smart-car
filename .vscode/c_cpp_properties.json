@@ -8,7 +8,13 @@
                 "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
                 "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
                 "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
-                "${workspaceFolder}/Drivers/CMSIS/Include"
+                "${workspaceFolder}/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Drivers/MPU6050/driver/eMPL",
+                "${workspaceFolder}/Drivers/MPU6050/driver/include",
+                "${workspaceFolder}/Drivers/MPU6050/driver/stm32L",
+                "${workspaceFolder}/Drivers/MPU6050/eMPL-hal",
+                "${workspaceFolder}/Drivers/MPU6050/mllite",
+                "${workspaceFolder}/Drivers/MPU6050/mpl"
             ],
             "defines": ["GCC_COMPILE=1", "WM_W600", "_DEBUG"],
             "compilerPath": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Wall -fdata-sections -ffunction-sections",

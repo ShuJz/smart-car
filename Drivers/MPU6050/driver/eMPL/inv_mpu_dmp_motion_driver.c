@@ -1274,11 +1274,11 @@ int dmp_set_interrupt_mode(unsigned char mode)
  *  @param[out] more        Number of remaining packets.
  *  @return     0 if successful.
  */
-int dmp_read_fifo(short *gyro, short *accel, long *quat,
-    unsigned long *timestamp, short *sensors, unsigned char *more)
+int dmp_read_fifo(short *gyro, short *accel, long *quat, unsigned long *timestamp, unsigned short *sensors, unsigned char *more)
 {
     unsigned char fifo_data[MAX_PACKET_LENGTH];
     unsigned char ii = 0;
+    int res;
 
     /* TODO: sensors[0] only changes when dmp_enable_feature is called. We can
      * cache this value and save some cycles.
@@ -1286,8 +1286,9 @@ int dmp_read_fifo(short *gyro, short *accel, long *quat,
     sensors[0] = 0;
 
     /* Get a packet. */
-    if (mpu_read_fifo_stream(dmp.packet_length, fifo_data, more))
-        return -1;
+    res = mpu_read_fifo_stream(dmp.packet_length, fifo_data, more);
+    if (res)
+        return res;
 
     /* Parse DMP packet. */
     if (dmp.feature_mask & (DMP_FEATURE_LP_QUAT | DMP_FEATURE_6X_LP_QUAT)) {
@@ -1328,12 +1329,12 @@ int dmp_read_fifo(short *gyro, short *accel, long *quat,
         sensors[0] |= INV_WXYZ_QUAT;
 #endif
     }
-
     if (dmp.feature_mask & DMP_FEATURE_SEND_RAW_ACCEL) {
         accel[0] = ((short)fifo_data[ii+0] << 8) | fifo_data[ii+1];
         accel[1] = ((short)fifo_data[ii+2] << 8) | fifo_data[ii+3];
         accel[2] = ((short)fifo_data[ii+4] << 8) | fifo_data[ii+5];
         ii += 6;
+        
         sensors[0] |= INV_XYZ_ACCEL;
     }
 

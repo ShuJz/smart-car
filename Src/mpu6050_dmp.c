@@ -19,7 +19,6 @@
 #include "eMPL_outputs.h"
 #include "mpu.h"
 #include "inv_mpu.h"
-#include "log.h"
 #include "packet.h"
 
 
@@ -303,67 +302,62 @@ static void read_from_mpl(void)
 
     }
 		/*********发送数据到匿名四轴上位机**********/
-    if(1)
-    {
-				#ifdef USE_LCD_DISPLAY
+    // if(1){
+    //     #ifdef USE_LCD_DISPLAY
 
-					char cStr [ 70 ];
+    //         char cStr [ 70 ];
 
-				#endif
+    //     #endif
+    //     unsigned long timestamp,step_count,walk_time;
+    //     /*获取欧拉角*/
+    //     if (inv_get_sensor_type_euler(data, &accuracy,(inv_time_t*)&timestamp)){
+    //         float Pitch,Roll,Yaw;
+    //         Pitch =data[0]*1.0/(1<<16) ;
+    //         Roll = data[1]*1.0/(1<<16);
+    //         Yaw = data[2]*1.0/(1<<16);
+            
+    //         /*向匿名上位机发送姿态*/
+    //         Data_Send_Status(Pitch,Roll,Yaw);
+    //         /*向匿名上位机发送原始数据*/
+    //         Send_Data((int16_t *)&sensors.gyro.raw,(int16_t *)&sensors.accel.raw);
+            
+    //         #ifdef USE_LCD_DISPLAY
 
-				unsigned long timestamp,step_count,walk_time;
+    //             sprintf ( cStr, "Pitch :   %.4f   ",Pitch );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
+    //             ILI9341_DispString_EN(30,90,cStr);
 
-			
-				/*获取欧拉角*/
-			  if (inv_get_sensor_type_euler(data, &accuracy,(inv_time_t*)&timestamp))
-						{
-							float Pitch,Roll,Yaw;
-							Pitch =data[0]*1.0/(1<<16) ;
-							Roll = data[1]*1.0/(1<<16);
-							Yaw = data[2]*1.0/(1<<16);
-							
-							/*向匿名上位机发送姿态*/
-							Data_Send_Status(Pitch,Roll,Yaw);
-							/*向匿名上位机发送原始数据*/
-							Send_Data((int16_t *)&sensors.gyro.raw,(int16_t *)&sensors.accel.raw);
-							
-							#ifdef USE_LCD_DISPLAY
+    //             sprintf ( cStr, "Roll :   %.4f   ", Roll );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
+    //             ILI9341_DispString_EN(30,110,cStr);
 
-								sprintf ( cStr, "Pitch :   %.4f   ",Pitch );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
-								ILI9341_DispString_EN(30,90,cStr);
+    //             sprintf ( cStr, "Yaw :   %.4f   ", Yaw );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
+    //             ILI9341_DispString_EN(30,130,cStr);
 
-								sprintf ( cStr, "Roll :   %.4f   ", Roll );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
-								ILI9341_DispString_EN(30,110,cStr);
-
-								sprintf ( cStr, "Yaw :   %.4f   ", Yaw );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
-								ILI9341_DispString_EN(30,130,cStr);
-
-								/*温度*/
-								mpu_get_temperature(data,(inv_time_t*)&timestamp); 
-								
-								sprintf ( cStr, "Temperature :   %.2f   ", data[0]*1.0/(1<<16) );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
-								ILI9341_DispString_EN(30,150,cStr);
-							#endif
+    //             /*温度*/
+    //             mpu_get_temperature(data,(inv_time_t*)&timestamp); 
+                
+    //             sprintf ( cStr, "Temperature :   %.2f   ", data[0]*1.0/(1<<16) );	//inv_get_sensor_type_euler读出的数据是Q16格式，所以左移16位.
+    //             ILI9341_DispString_EN(30,150,cStr);
+    //         #endif
+        
+    //     }
 						
-						}
-						
-					/*获取步数*/        
-				get_tick_count(&timestamp);
-				if (timestamp > hal.next_pedo_ms) {
+	// 	/*获取步数*/        
+    //     get_tick_count(&timestamp);
+    //     if (timestamp > hal.next_pedo_ms) {
 
-						hal.next_pedo_ms = timestamp + PEDO_READ_MS;
-						dmp_get_pedometer_step_count(&step_count);
-						dmp_get_pedometer_walk_time(&walk_time);
-					
-						#ifdef USE_LCD_DISPLAY
+    //             hal.next_pedo_ms = timestamp + PEDO_READ_MS;
+    //             dmp_get_pedometer_step_count(&step_count);
+    //             dmp_get_pedometer_walk_time(&walk_time);
+            
+    //             #ifdef USE_LCD_DISPLAY
 
-							sprintf(cStr, "Walked steps :  %ld  steps over  %ld  milliseconds..",step_count,walk_time);
-						
-							ILI9341_DispString_EN(0,180,cStr);
-						#endif
+    //                 sprintf(cStr, "Walked steps :  %ld  steps over  %ld  milliseconds..",step_count,walk_time);
+                
+    //                 ILI9341_DispString_EN(0,180,cStr);
+    //             #endif
 
-				}
-			}
+    //     }
+    // }
 
 
     if (hal.report & PRINT_ROT_MAT) {
@@ -587,6 +581,114 @@ static inline void run_self_test(void)
 
 }
 
+static void mpu_setup(void){
+    hal.sensors |= ACCEL_ON;
+    hal.sensors |= GYRO_ON;
+    setup_gyro();
+    hal.report |= PRINT_ACCEL;
+    hal.report |= PRINT_GYRO;
+    hal.report |= PRINT_EULER;
+    hal.report |= PRINT_ROT_MAT;
+    hal.report |= PRINT_QUAT;
+    hal.report |= PRINT_HEADING;
+    hal.report |= PRINT_LINEAR_ACCEL;
+    hal.report |= PRINT_GRAVITY_VECTOR;
+#ifdef COMPASS_ENABLED
+		send_status_compass();
+#endif
+    /* Depending on your application, sensor data may be needed at a faster or
+     * slower rate. These commands can speed up or slow down the rate at which
+     * the sensor data is pushed to the MPL.
+     *
+     * In this example, the compass rate is never changed.
+     */
+    if (hal.dmp_on) {
+        dmp_set_fifo_rate(40);
+        inv_set_quat_sample_rate(25000L);
+    } else{
+        mpu_set_sample_rate(40);
+    }
+    inv_set_gyro_sample_rate(25000L);
+    inv_set_accel_sample_rate(25000L);
+
+    /* Set hardware to interrupt on gesture event only. This feature is
+        * useful for keeping the MCU asleep until the DMP detects as a tap or
+        * orientation event.
+        */
+    dmp_set_interrupt_mode(DMP_INT_GESTURE);
+        /* Set hardware to interrupt periodically. */
+    // dmp_set_interrupt_mode(DMP_INT_CONTINUOUS);
+
+    /* Toggle pedometer display. */
+    hal.report ^= PRINT_PEDO;
+    /* Reset pedometer. */
+    dmp_set_pedometer_step_count(0);
+    dmp_set_pedometer_walk_time(0);
+    // case 'f':
+    // 
+    //     /* LP accel is not compatible with the DMP. */
+    //     return;
+    /* Toggle DMP. */
+    if (!hal.lp_accel_mode){
+        if (hal.dmp_on) {
+            unsigned short dmp_rate;
+            unsigned char mask = 0;
+            hal.dmp_on = 0;
+            mpu_set_dmp_state(0);
+            /* Restore FIFO settings. */
+            if (hal.sensors & ACCEL_ON)
+                mask |= INV_XYZ_ACCEL;
+            if (hal.sensors & GYRO_ON)
+                mask |= INV_XYZ_GYRO;
+            if (hal.sensors & COMPASS_ON)
+                mask |= INV_XYZ_COMPASS;
+            mpu_configure_fifo(mask);
+            /* When the DMP is used, the hardware sampling rate is fixed at
+                * 200Hz, and the DMP is configured to downsample the FIFO output
+                * using the function dmp_set_fifo_rate. However, when the DMP is
+                * turned off, the sampling rate remains at 200Hz. This could be
+                * handled in inv_mpu.c, but it would need to know that
+                * inv_mpu_dmp_motion_driver.c exists. To avoid this, we'll just
+                * put the extra logic in the application layer.
+                */
+            dmp_get_fifo_rate(&dmp_rate);
+            mpu_set_sample_rate(dmp_rate);
+            inv_quaternion_sensor_was_turned_off();
+            MPL_LOGI("DMP disabled.\n");
+        } 
+        else {
+            unsigned short sample_rate;
+            hal.dmp_on = 1;
+            /* Preserve current FIFO rate. */
+            mpu_get_sample_rate(&sample_rate);
+            dmp_set_fifo_rate(sample_rate);
+            inv_set_quat_sample_rate(1000000L / sample_rate);
+            mpu_set_dmp_state(1);
+            MPL_LOGI("DMP enabled.\n");
+        }
+    }
+    
+    /* Test the motion interrupt hardware feature. */
+	#ifndef MPU6050 // not enabled for 6050 product
+	    hal.motion_int_mode = 1;
+	#endif 
+
+    /* Toggle LP quaternion.
+    * The DMP features can be enabled/disabled at runtime. Use this same
+    * approach for other features.
+    */
+    hal.dmp_features ^= DMP_FEATURE_6X_LP_QUAT;
+    dmp_enable_feature(hal.dmp_features);
+    if (!(hal.dmp_features & DMP_FEATURE_6X_LP_QUAT)) {
+        inv_quaternion_sensor_was_turned_off();
+        MPL_LOGI("LP quaternion disabled.\n");
+    } 
+    else{
+        MPL_LOGI("LP quaternion enabled.\n");
+    }
+    hal.rx.cmd = 0;
+}
+
 static void handle_input(void)
 {
     MPU_DEBUG_FUNC();
@@ -599,11 +701,7 @@ void gyro_data_ready_cb(void)
     hal.new_gyro = 1;
 }
 
-/**
-  * @brief  主函数
-  * @param  无  
-  * @retval 无
-  */
+
 int mpu6050_init(void)
 {
 	
@@ -613,58 +711,25 @@ int mpu6050_init(void)
 	unsigned long timestamp;
 	struct int_param_s int_param;
 
-    // unsigned char new_temp = 0;
-
-// #ifdef USE_LCD_DISPLAY
-
-// 	ILI9341_Init ();         //LCD 初始化
-//   ILI9341_GramScan ( 6 );
-// 	LCD_SetFont(&Font8x16);
-// 	LCD_SetColors(RED,BLACK);
-// #endif
-
-	
-// #ifdef USE_LCD_DISPLAY		
-//   ILI9341_Clear ( 0, 0, 240, 320);
-	
-//   ILI9341_DispString_EN ( 20, 20, "This is a MPU6050 demo" );
-// #endif
-
-	printf("mpu 6050 test start");
+	MPL_LOGE("[mpu6050_dmp] MPU6050 initializing start\n");
 
 	
 	result = mpu_init(&int_param);
-	//   if (result) {
-	// 		LED_RED;
-	// 	  MPL_LOGE("Could not initialize gyro.result =  %d\n",result);
-			
-	// 		#ifdef USE_LCD_DISPLAY		
-			
-	// 			LCD_SetColors(BLUE,BLACK);
-
-	// 			ILI9341_DispString_EN ( 0, 40, "No MPU6050 detceted!Please check the hardware connection.");
-	// 		#endif
-	//   }
-	// 	else
-	// 	{
-	// 		LED_GREEN;
-			
-	// 		#ifdef USE_LCD_DISPLAY		
-	// 			ILI9341_DispString_EN(30,40,"MPU6050 decteted!");
-	// 		#endif
-	// 	}
+    if (result) {
+        MPL_LOGE("[mpu6050_dmp]Could not initialize mpu.\n");
+    }
 	  
-	 /* If you're not using an MPU9150 AND you're not using DMP features, this
-     * function will place all slaves on the primary bus.
-     * mpu_set_bypass(1);
-     */
+    /* If you're not using an MPU9150 AND you're not using DMP features, this
+    * function will place all slaves on the primary bus.
+    * mpu_set_bypass(1);
+    */
 
-	  result = inv_init_mpl();
-	  if (result) {
-		  MPL_LOGE("Could not initialize MPL.\n");
-	  }
-	  
-	  /* Compute 6-axis and 9-axis quaternions. */
+    result = inv_init_mpl();
+    if (result) {
+        MPL_LOGE("[mpu6050_dmp]Could not initialize MPL.\n");
+    }
+    
+    /* Compute 6-axis and 9-axis quaternions. */
     inv_enable_quaternion();
     inv_enable_9x_sensor_fusion();
     /* The MPL expects compass data at a constant rate (matching the rate
@@ -713,11 +778,11 @@ int mpu6050_init(void)
   result = inv_start_mpl();
   if (result == INV_ERROR_NOT_AUTHORIZED) {
       while (1) {
-          MPL_LOGE("Not authorized.\n");
+          MPL_LOGE("[mpu6050_dmp] Not authorized.\n");
       }
   }
   if (result) {
-      MPL_LOGE("Could not start the MPL.\n");
+      MPL_LOGE("[mpu6050_dmp] Could not start the MPL.\n");
   }
 
     /* Get/set hardware configuration. Start gyro. */
@@ -725,7 +790,10 @@ int mpu6050_init(void)
 #ifdef COMPASS_ENABLED
     mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS);
 #else
-    mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL);
+    result = mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL);
+    if (result) {
+        MPL_LOGE("[mpu6050_dmp] Could not set_sensors. %d\n", result);
+    }
 #endif
     /* Push both gyro and accel data into the FIFO. */
     mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);
@@ -781,41 +849,43 @@ int mpu6050_init(void)
     hal.next_compass_ms = 0;
     hal.next_temp_ms = 0;
 
-  /* Compass reads are handled by scheduler. */
-  get_tick_count(&timestamp);
-
+    /* Compass reads are handled by scheduler. */
+    get_tick_count(&timestamp);
     /* To initialize the DMP:
-     * 1. Call dmp_load_motion_driver_firmware(). This pushes the DMP image in
-     *    inv_mpu_dmp_motion_driver.h into the MPU memory.
-     * 2. Push the gyro and accel orientation matrix to the DMP.
-     * 3. Register gesture callbacks. Don't worry, these callbacks won't be
-     *    executed unless the corresponding feature is enabled.
-     * 4. Call dmp_enable_feature(mask) to enable different features.
-     * 5. Call dmp_set_fifo_rate(freq) to select a DMP output rate.
-     * 6. Call any feature-specific control functions.
-     *
-     * To enable the DMP, just call mpu_set_dmp_state(1). This function can
-     * be called repeatedly to enable and disable the DMP at runtime.
-     *
-     * The following is a short summary of the features supported in the DMP
-     * image provided in inv_mpu_dmp_motion_driver.c:
-     * DMP_FEATURE_LP_QUAT: Generate a gyro-only quaternion on the DMP at
-     * 200Hz. Integrating the gyro data at higher rates reduces numerical
-     * errors (compared to integration on the MCU at a lower sampling rate).
-     * DMP_FEATURE_6X_LP_QUAT: Generate a gyro/accel quaternion on the DMP at
-     * 200Hz. Cannot be used in combination with DMP_FEATURE_LP_QUAT.
-     * DMP_FEATURE_TAP: Detect taps along the X, Y, and Z axes.
-     * DMP_FEATURE_ANDROID_ORIENT: Google's screen rotation algorithm. Triggers
-     * an event at the four orientations where the screen should rotate.
-     * DMP_FEATURE_GYRO_CAL: Calibrates the gyro data after eight seconds of
-     * no motion.
-     * DMP_FEATURE_SEND_RAW_ACCEL: Add raw accelerometer data to the FIFO.
-     * DMP_FEATURE_SEND_RAW_GYRO: Add raw gyro data to the FIFO.
-     * DMP_FEATURE_SEND_CAL_GYRO: Add calibrated gyro data to the FIFO. Cannot
-     * be used in combination with DMP_FEATURE_SEND_RAW_GYRO.
-     */
+    * 1. Call dmp_load_motion_driver_firmware(). This pushes the DMP image in
+    *    inv_mpu_dmp_motion_driver.h into the MPU memory.
+    * 2. Push the gyro and accel orientation matrix to the DMP.
+    * 3. Register gesture callbacks. Don't worry, these callbacks won't be
+    *    executed unless the corresponding feature is enabled.
+    * 4. Call dmp_enable_feature(mask) to enable different features.
+    * 5. Call dmp_set_fifo_rate(freq) to select a DMP output rate.
+    * 6. Call any feature-specific control functions.
+    *
+    * To enable the DMP, just call mpu_set_dmp_state(1). This function can
+    * be called repeatedly to enable and disable the DMP at runtime.
+    *
+    * The following is a short summary of the features supported in the DMP
+    * image provided in inv_mpu_dmp_motion_driver.c:
+    * DMP_FEATURE_LP_QUAT: Generate a gyro-only quaternion on the DMP at
+    * 200Hz. Integrating the gyro data at higher rates reduces numerical
+    * errors (compared to integration on the MCU at a lower sampling rate).
+    * DMP_FEATURE_6X_LP_QUAT: Generate a gyro/accel quaternion on the DMP at
+    * 200Hz. Cannot be used in combination with DMP_FEATURE_LP_QUAT.
+    * DMP_FEATURE_TAP: Detect taps along the X, Y, and Z axes.
+    * DMP_FEATURE_ANDROID_ORIENT: Google's screen rotation algorithm. Triggers
+    * an event at the four orientations where the screen should rotate.
+    * DMP_FEATURE_GYRO_CAL: Calibrates the gyro data after eight seconds of
+    * no motion.
+    * DMP_FEATURE_SEND_RAW_ACCEL: Add raw accelerometer data to the FIFO.
+    * DMP_FEATURE_SEND_RAW_GYRO: Add raw gyro data to the FIFO.
+    * DMP_FEATURE_SEND_CAL_GYRO: Add calibrated gyro data to the FIFO. Cannot
+    * be used in combination with DMP_FEATURE_SEND_RAW_GYRO.
+    */
 
-    dmp_load_motion_driver_firmware();
+    result = dmp_load_motion_driver_firmware();
+    if (result) {
+        MPL_LOGE("[mpu6050_dmp] Could not load_motion_driver_firmware. %d\n", result);
+    }
     dmp_set_orientation(
         inv_orientation_matrix_to_scalar(gyro_pdata.orientation));
     dmp_register_tap_cb(tap_cb);
@@ -841,33 +911,20 @@ int mpu6050_init(void)
     dmp_set_fifo_rate(DEFAULT_MPU_HZ);
     mpu_set_dmp_state(1);
     hal.dmp_on = 1;
+
+    hal.report |= PRINT_ACCEL;
+    // mpu_setup();
 }
 
 int mpu6050_run(void){
-	
     unsigned long timestamp;
     unsigned char new_temp = 0;
 
     unsigned long sensor_timestamp;
     int new_data = 0;
-    if (__HAL_UART_GET_FLAG (DEBUG_USARTx, UART_FLAG_RXNE)) {
-    /* A byte has been received via USART. See handle_input for a list of
-        * valid commands.
-        */
-        __HAL_UART_CLEAR_FLAG(DEBUG_USARTx, UART_FLAG_RXNE);
-        handle_input();
-    }
+    short res;
     get_tick_count(&timestamp);
-    #ifdef COMPASS_ENABLED
-    /* We're not using a data ready interrupt for the compass, so we'll
-        * make our compass reads timer-based instead.
-        */
-    if ((timestamp > hal.next_compass_ms) && !hal.lp_accel_mode &&
-        hal.new_gyro && (hal.sensors & COMPASS_ON)) {
-        hal.next_compass_ms = timestamp + COMPASS_READ_MS;
-        new_compass = 1;
-    }
-    #endif
+
     /* Temperature data doesn't need to be read with every gyro sample.
         * Let's make them timer-based like the compass reads.
         */
@@ -876,21 +933,21 @@ int mpu6050_run(void){
         new_temp = 1;
     }
 
-    if (hal.motion_int_mode) {
-        /* Enable motion interrupt. */
-        mpu_lp_motion_interrupt(500, 1, 5);
-        /* Notify the MPL that contiguity was broken. */
-        inv_accel_was_turned_off();
-        inv_gyro_was_turned_off();
-        inv_compass_was_turned_off();
-        inv_quaternion_sensor_was_turned_off();
-        /* Wait for the MPU interrupt. */
-        while (!hal.new_gyro) {}
-        /* Restore the previous sensor configuration. */
-        mpu_lp_motion_interrupt(0, 0, 0);
-        hal.motion_int_mode = 0;
-    }
-
+    // if (hal.motion_int_mode) {
+    //     /* Enable motion interrupt. */
+    //     mpu_lp_motion_interrupt(500, 1, 5);
+    //     /* Notify the MPL that contiguity was broken. */
+    //     inv_accel_was_turned_off();
+    //     inv_gyro_was_turned_off();
+    //     inv_compass_was_turned_off();
+    //     inv_quaternion_sensor_was_turned_off();
+    //     /* Wait for the MPU interrupt. */
+    //     while (!hal.new_gyro) {}
+    //     /* Restore the previous sensor configuration. */
+    //     mpu_lp_motion_interrupt(0, 0, 0);
+    //     hal.motion_int_mode = 0;
+    // }
+    
     if (!hal.sensors || !hal.new_gyro) {
         return 0;
     }    
@@ -906,7 +963,8 @@ int mpu6050_run(void){
         hal.new_gyro = 0;
     } 
     else if (hal.new_gyro && hal.dmp_on) {
-        short gyro[3], accel_short[3], sensors;
+        short gyro[3], accel_short[3];
+        unsigned short sensors;
         unsigned char more;
         long accel[3], quat[4], temperature;
         /* This function gets new data from the FIFO when the DMP is in
@@ -921,7 +979,8 @@ int mpu6050_run(void){
             * registered). The more parameter is non-zero if there are
             * leftover packets in the FIFO.
             */
-        dmp_read_fifo(gyro, accel_short, quat, &sensor_timestamp, &sensors, &more);
+        res = dmp_read_fifo(gyro, accel_short, quat, &sensor_timestamp, &sensors, &more);
+
         if (!more)
             hal.new_gyro = 0;
         if (sensors & INV_XYZ_GYRO) {
@@ -1009,7 +1068,6 @@ int mpu6050_run(void){
 
     if (new_data) {
         inv_execute_on_data();
-
         /* This function reads bias-compensated sensor data and sensor
             * fusion outputs from the MPL. The outputs are formatted as seen
             * in eMPL_outputs.c. This function only needs to be called at the

@@ -28,7 +28,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "mpu6050_hw.h"
+// #include "mpu6050_hw.h"
 #include "mpu6050_dmp.h"
 #include "sys_tick.h"
 /* USER CODE END Includes */
@@ -100,8 +100,8 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_TIM4_Init();
-  MX_USART1_UART_Init();
   MX_I2C1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_3);     //Motor PWM
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);     //Steering motor PWM
@@ -120,14 +120,21 @@ int main(void)
   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 15);
   HAL_Delay(2000);
 
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+  HAL_Delay(500);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+  HAL_Delay(500);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+  HAL_Delay(500);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+
   //Initial MPU6050
+  #ifdef DEBUG
+    // printf("[main] Debuge mode, printf can be used!!!(printf)\n");
+    // printf("[main] Initializing mpu6050...\n");
+  #endif
   // MPU6050_Init();
   mpu6050_init();
-  #ifdef DEBUG
-    int mpu6050 = MPU6050ReadID();
-    MPU6050ReadConfigRegs();
-    printf("Debuge mode, printf can be used!!!(printf)\n");
-  #endif
   while (1)
   {
     /* USER CODE END WHILE */
@@ -148,14 +155,9 @@ int main(void)
 
     #ifdef DEBUG
       mpu6050_run();
-      // MPU6050ReadAcc(accData);
-      // if (mpu6050 == 1){
-      //   printf("accData is: %d, %d, %d\n"), accData[0], accData[1], accData[2];
-      // }
-      
     #endif
 
-    HAL_Delay(10);
+    // HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }
@@ -202,7 +204,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   #ifdef DEBUG
     Usart_SendString((uint8_t *)recv_buf);
-    printf("UART data is (printf): ");
+    printf("[main] UART data is (printf): ");
     for (int i = 0; i<9; i++)
       printf("%d, ", *(recv_buf + i));
     printf('(printf)\n');
